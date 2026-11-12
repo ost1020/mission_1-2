@@ -11,7 +11,7 @@ class Quiz:
 
 def main():
     quiz_list = [
-        Quiz("이번에는 조지가 씻을 차례다를 영어로 하면?", ["조지 워싱턴", "조지 클루니", "폴 조지", "조지아"], 1),
+        Quiz("'이번에는 조지가 씻을 차례다를 영어로 하면?'", ["조지 워싱턴", "조지 클루니", "폴 조지", "조지아"], 1),
         Quiz("자기 전에 먹는 과자는?", ["맛동산", "포카칩", "눈을 감자", "허니버터칩"], 3),
         Quiz("공이 굴러가면서 하는 말은?", ["공감", "안뇽?", "왔나", "온나~"], 1),
         Quiz("무가 자기소개를 할 때 하는 말은?", ["무서운 이야기", "나무", "무소고기국", "무지렁이"], 2),
@@ -118,9 +118,18 @@ def main():
                 quiz_list.append(Quiz(new_q, new_choices, new_ans))
                 print("\n성공적으로 퀴즈가 추가되었어용! 👏")
             elif choice == 3:
-                print("\n[퀴즈 목록 기능] - 아직 준비 중에용!")
+                print("\n--- [현재 퀴즈 목록이에용!] ---")
+                if not quiz_list:
+                    print("안내: 퀴즈가 하나도 없어용! 먼저 추가해 주세용.")
+                else:
+                    # quiz_list 바구니에서 문제(question)만 번호표 달아서 뽑아내기
+                    for i, quiz in enumerate(quiz_list, 1):
+                        print(f"{i}. {quiz.question}")
+                        
             elif choice == 4:
-                print("\n[점수 확인 기능] - 아직 준비 중에용!")
+                # 명예의 전당 전광판(best_score) 그대로 띄워주기
+                print(f"\n현재까지의 최고 점수는 {best_score}점이에용! 🏆")
+
             elif choice == 5:
                 print("\n게임을 종료할게용. 수고했어용!")
                 break
