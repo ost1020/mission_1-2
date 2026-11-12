@@ -10,7 +10,6 @@ class Quiz:
             print(f"{i}. {choice}")
 
 def main():
-        # --- 여기서부터 수정된 부분! ---
     quiz_list = [
         Quiz("이번에는 조지가 씻을 차례다를 영어로 하면?", ["조지 워싱턴", "조지 클루니", "폴 조지", "조지아"], 1),
         Quiz("자기 전에 먹는 과자는?", ["맛동산", "포카칩", "눈을 감자", "허니버터칩"], 3),
@@ -19,7 +18,6 @@ def main():
         Quiz("쇼핑카트에 만두만 넣으면?", ["왕만두", "군만두", "만두튀김", "카트만두"], 4)
     ]
     best_score = 0
-    # --- 여기까지 ---
 
     while True:
         print("\n=== 🤯 넌센스 퀴즈 게임 ===")
@@ -83,7 +81,42 @@ def main():
                     best_score = score
                     print("축하해용! 최고 점수를 갱신했어용! 🏆")
             elif choice == 2:
-                print("\n[퀴즈 추가 기능] - 아직 준비 중에용!")
+                print("\n--- [나만의 퀴즈 추가하기!] ---")
+                
+                # 1. 문제 입력받기
+                new_q = input("새로운 넌센스 문제를 입력해 주세용: ").strip()
+                if not new_q:
+                    print("안내: 문제가 비어있어용! 추가가 취소되었어용.")
+                    continue
+                
+                # 2. 보기 4개 입력받기 (리스트 바구니에 차곡차곡 넣기)
+                new_choices = []
+                for i in range(1, 5):
+                    c = input(f"{i}번 보기를 입력해 주세용: ").strip()
+                    # 만약 보기를 안 적으면 기본값으로 대체 (에러 방지)
+                    if not c:
+                        c = f"기본 보기 {i}"
+                    new_choices.append(c)
+                
+                # 3. 정답 번호 입력받기 (미니 방어막)
+                while True:
+                    try:
+                        new_ans_input = input("정답 번호를 입력해 주세용 (1-4): ").strip()
+                        if not new_ans_input:
+                            continue
+                            
+                        new_ans = int(new_ans_input)
+                        
+                        if 1 <= new_ans <= 4:
+                            break
+                        else:
+                            print("안내: 1에서 4 사이의 번호만 정답이 될 수 있어용.")
+                    except ValueError:
+                        print("안내: 숫자가 아니에용! 번호로 입력해 줘용.")
+                
+                # 4. 새로운 붕어빵(Quiz 객체)을 구워서 기존 바구니(quiz_list)에 밀어 넣기!
+                quiz_list.append(Quiz(new_q, new_choices, new_ans))
+                print("\n성공적으로 퀴즈가 추가되었어용! 👏")
             elif choice == 3:
                 print("\n[퀴즈 목록 기능] - 아직 준비 중에용!")
             elif choice == 4:
