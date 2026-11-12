@@ -1,5 +1,6 @@
 import json
 import os
+import random
 
 class Quiz:
     def __init__(self, question, choices, answer):
@@ -28,9 +29,20 @@ class QuizGame:
         # 기능 1: 퀴즈 풀기
     def play_quiz(self):
         print("\n--- [퀴즈 게임 시작!] ---")
+        
+        # 1. 만약 바구니가 비어있으면 튕겨내기 (에러 방어막)
+        if not self.quiz_list:
+            print("안내: 풀 수 있는 퀴즈가 없어용! 먼저 퀴즈를 추가해 주세용.")
+            return
+            
+        # 2. 제비뽑기 기계 작동! (원본 바구니는 냅두고, 랜덤으로 섞인 1회용 바구니 만들기)
+        # random.sample(원본 리스트, 뽑을 개수) -> 원본에서 원하는 개수만큼 섞어서 뽑아줌!
+        play_list = random.sample(self.quiz_list, len(self.quiz_list))
+        
         score = 0 
         
-        for quiz in self.quiz_list:  # self. 붙음!
+        # 3. 컨베이어 벨트에 원본(self.quiz_list) 대신 방금 섞은 play_list를 올려준다!
+        for quiz in play_list: 
             quiz.display_quiz() 
             
             while True:
