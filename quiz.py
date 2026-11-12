@@ -27,7 +27,6 @@ class QuizGame:
         self.load_data()
 
         # 기능 1: 퀴즈 풀기
-        # 기능 1: 퀴즈 풀기
     def play_quiz(self):
         print("\n--- [퀴즈 게임 시작!] ---")
         
@@ -118,7 +117,7 @@ class QuizGame:
             except ValueError:
                 print("안내: 숫자가 아니에용! 번호로 입력해 줘용.")
         
-                self.quiz_list.append(Quiz(new_q, new_choices, new_ans))
+        self.quiz_list.append(Quiz(new_q, new_choices, new_ans))
         self.save_data()
         print("\n성공적으로 퀴즈가 추가되었어용! 👏")
 
@@ -130,10 +129,13 @@ class QuizGame:
         else:
             for i, quiz in enumerate(self.quiz_list, 1): # self. 붙음!
                 print(f"{i}. {quiz.question}")
+        input("\n목록을 다 확인했으면 엔터(Enter)를 눌러서 돌아가세용! ↵")
 
-    # 기능 4: 점수 확인
+    # 기능 4: 최고 점수 확인
     def show_score(self):
         print(f"\n현재까지의 최고 점수는 {self.best_score}점이에용! 🏆") # self. 붙음!
+        input("\n목록을 다 확인했으면 엔터(Enter)를 눌러서 돌아가세용! ↵")
+    
     # 기능 5: 데이터 불러오기 엔진
     def load_data(self):
         if os.path.exists("state.json"): # state.json 파일이 컴퓨터에 있는지 확인!
@@ -174,11 +176,12 @@ class QuizGame:
             print("1. 퀴즈를 풀어볼래용!")
             print("2. 퀴즈를 추가할래용!")
             print("3. 퀴즈 목록을 확인할래용!")
-            print("4. 점수를 알려줘용!")
-            print("5. 종료할래용!")
+            print("4. 퀴즈를 삭제할래용! 🗑️")  # 새로 추가!
+            print("5. 점수를 알려줘용!")
+            print("6. 종료할래용!")
             
             try:
-                choice = int(input("메뉴를 선택해 줘용 (1~5): ").strip())
+                choice = int(input("메뉴를 선택해 줘용 (1~6): ").strip())
                 
                 if choice == 1:
                     self.play_quiz()  # 자기가 가진 play_quiz 버튼을 누름!
@@ -187,16 +190,55 @@ class QuizGame:
                 elif choice == 3:
                     self.show_list()
                 elif choice == 4:
-                    self.show_score()
+                    self.delete_quiz() # 방금 만든 삭제 리모컨 찰칵!
                 elif choice == 5:
+                    self.show_score()
+                elif choice == 6:
                     self.save_data()  # <--- 이 줄 추가!
                     print("\n게임을 종료할게용. 수고했어용!")
                     break
 
                 else:
-                    print("안내: 1에서 5 사이의 숫자만 입력할 수 있어용.")
+                    print("안내: 1에서 6 사이의 숫자만 입력할 수 있어용.")
             except ValueError:
                 print("안내: 숫자가 아니에용! 정확한 메뉴 번호를 입력해 줘용.")
+        
+    def delete_quiz(self):
+        print("\n--- [퀴즈 삭제하기 🗑️] ---")
+        # 1. Falsy 특성을 이용한 빈 바구니 검사
+        if not self.quiz_list:
+            print("안내: 삭제할 퀴즈가 하나도 없어용!")
+            return
+            
+        # 2. enumerate로 번호표 달아서 보여주기
+        for i, quiz in enumerate(self.quiz_list, 1):
+            print(f"{i}. {quiz.question}")
+            
+        # 3. 좁게 설정한 안전 방어막 (지뢰 탐지기)
+        while True:
+            try:
+                del_input = input("\n삭제할 퀴즈 번호를 입력해 주세용 (취소는 0): ").strip()
+                if not del_input:
+                    continue
+                    
+                del_num = int(del_input)
+                
+                # 취소 로직
+                if del_num == 0:
+                    print("삭제를 취소했어용.")
+                    break
+                    
+                # 입력 번호가 유효한 인덱스 범위 안에 있는지 확인
+                if 1 <= del_num <= len(self.quiz_list):
+                    deleted_quiz = self.quiz_list.pop(del_num - 1)
+                    self.save_data()  # <--- 메모리에서 지운 후 파일에도 덮어쓰기 완료!
+                    print(f"'{deleted_quiz.question}' 문제가 성공적으로 삭제되었어용! 👏")
+                    break
+                else:
+                    print(f"안내: 1에서 {len(self.quiz_list)} 사이의 번호를 골라주세용.")
+                    
+            except ValueError:
+                print("안내: 숫자가 아니에용! 정확한 번호를 입력해 줘용.")
 
 # ==========================================
 # 3. 프로그램 실행 스위치
