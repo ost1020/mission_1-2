@@ -1,4 +1,5 @@
-import json  # 나중에 state.json 파일 저장을 위해 쓸 부품이야!
+import json
+import os
 
 class Quiz:
     def __init__(self, question, choices, answer):
@@ -22,6 +23,7 @@ class QuizGame:
             Quiz("쇼핑카트에 만두만 넣으면?", ["왕만두", "군만두", "만두튀김", "카트만두"], 4)
         ]
         self.best_score = 0
+        self.load_data()
 
         # 기능 1: 퀴즈 풀기
     def play_quiz(self):
@@ -57,6 +59,7 @@ class QuizGame:
         
         if score > self.best_score:  # self. 붙음!
             self.best_score = score
+            self.save_data()
             print("축하해용! 최고 점수를 갱신했어용! 🏆")
 
     # 기능 2: 퀴즈 추가
@@ -89,7 +92,8 @@ class QuizGame:
             except ValueError:
                 print("안내: 숫자가 아니에용! 번호로 입력해 줘용.")
         
-        self.quiz_list.append(Quiz(new_q, new_choices, new_ans)) # self. 붙음!
+                self.quiz_list.append(Quiz(new_q, new_choices, new_ans))
+        self.save_data()
         print("\n성공적으로 퀴즈가 추가되었어용! 👏")
 
     # 기능 3: 퀴즈 목록
@@ -104,6 +108,38 @@ class QuizGame:
     # 기능 4: 점수 확인
     def show_score(self):
         print(f"\n현재까지의 최고 점수는 {self.best_score}점이에용! 🏆") # self. 붙음!
+    # 기능 5: 데이터 불러오기 엔진
+    def load_data(self):
+        if os.path.exists("state.json"): # state.json 파일이 컴퓨터에 있는지 확인!
+            with open("state.json", "r", encoding="utf-8") as f:
+                data = json.load(f) # json 파일 안의 데이터를 파이썬 딕셔너리로 싹 변환해 줘.
+                
+                self.best_score = data.get("best_score", 0) # 명예의 전당 복구!
+                
+                # 기존 퀴즈 Ба구니 비우고 파일에 있는 걸로 다시 꽉 채우기
+                self.quiz_list = []
+                for q in data.get("quizzes", []):
+                    self.quiz_list.append(Quiz(q["question"], q["choices"], q["answer"]))
+            print("\n📂 저장된 데이터를 성공적으로 불러왔어용!")
+        # 파일이 없으면 아무 일도 안 함 (기본 퀴즈 5개로 알아서 시작됨)
+
+    # 기능 6: 데이터 파일로 저장하기 엔진
+    def save_data(self):
+        # json 파일에 넣기 좋게 딕셔너리 형태로 싹 다 정리해
+        data = {
+            "best_score": self.best_score,
+            "quizzes": []
+        }
+        for quiz in self.quiz_list:
+            data["quizzes"].append({
+                "question": quiz.question,
+                "choices": quiz.choices,
+                "answer": quiz.answer
+            })
+        
+        # state.json 파일에 덮어쓰기 모드("w")로 콱 저장해버리기!
+        with open("state.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
     # 게임 전체를 굴리는 메인 모터 (기존 while True 역할)
     def run(self):
@@ -127,8 +163,10 @@ class QuizGame:
                 elif choice == 4:
                     self.show_score()
                 elif choice == 5:
+                    self.save_data()  # <--- 이 줄 추가!
                     print("\n게임을 종료할게용. 수고했어용!")
                     break
+
                 else:
                     print("안내: 1에서 5 사이의 숫자만 입력할 수 있어용.")
             except ValueError:
