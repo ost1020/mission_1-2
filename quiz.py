@@ -27,21 +27,35 @@ class QuizGame:
         self.load_data()
 
         # 기능 1: 퀴즈 풀기
+        # 기능 1: 퀴즈 풀기
     def play_quiz(self):
         print("\n--- [퀴즈 게임 시작!] ---")
         
-        # 1. 만약 바구니가 비어있으면 튕겨내기 (에러 방어막)
         if not self.quiz_list:
             print("안내: 풀 수 있는 퀴즈가 없어용! 먼저 퀴즈를 추가해 주세용.")
             return
             
-        # 2. 제비뽑기 기계 작동! (원본 바구니는 냅두고, 랜덤으로 섞인 1회용 바구니 만들기)
-        # random.sample(원본 리스트, 뽑을 개수) -> 원본에서 원하는 개수만큼 섞어서 뽑아줌!
-        play_list = random.sample(self.quiz_list, len(self.quiz_list))
+        # --- [새로 추가된 구역: 풀 문제 개수 입력받기 방어막] ---
+        max_q = len(self.quiz_list) # 현재 바구니에 있는 총 문제 수
+        while True:
+            try:
+                num_input = input(f"몇 문제를 풀래용? (1~{max_q}): ").strip()
+                if not num_input:
+                    continue
+                num_q = int(num_input)
+                if 1 <= num_q <= max_q:
+                    break
+                else:
+                    print(f"안내: 1에서 {max_q} 사이의 숫자만 입력해주세용.")
+            except ValueError:
+                print("안내: 숫자가 아니에용! 숫자로 입력해 줘용.")
+        # --------------------------------------------------------
+
+        # 제비뽑기 기계: 전체 개수(len) 대신, 방금 입력받은 숫자(num_q)만큼만 뽑기!
+        play_list = random.sample(self.quiz_list, num_q)
         
         score = 0 
         
-        # 3. 컨베이어 벨트에 원본(self.quiz_list) 대신 방금 섞은 play_list를 올려준다!
         for quiz in play_list: 
             quiz.display_quiz() 
             
