@@ -40,23 +40,23 @@ mission_1-2/
 
 ## 개발환경 및 깃허브 관련
 
-![개발환경](image/개발환경.png) 
+![개발환경](image/dev_env.png)
 
-![깃허브 로그](image/깃허브로그.png)
+![깃허브 로그](image/github_log.png)
 
-![깃허브 클론 제작](image/클론제작.png)
+![깃허브 클론 제작](image/git_clone.png)
 
 ## 📸 실행 화면 스크린샷
 
 ### 메인 메뉴
-![메뉴](image/메인메뉴.png)
+![메뉴](image/main_menu.png)
 
 ### 퀴즈 플레이
-![퀴즈 풀이_1](image/퀴즈풀이_1.png) 
-![퀴즈 풀이_2](image/퀴즈풀이_2.png)
+![퀴즈 풀이_1](image/quiz_play_1.png)
+![퀴즈 풀이_2](image/quiz_play_2.png)
 
 ### 퀴즈 추가
-![퀴즈 추가](image/퀴즈추가및목록.png)
+![퀴즈 추가](image/quiz_add_list.png)
 
 ### 최고 점수 확인
-![퀴즈 최고 점수 확인](image/퀴즈점수.png)
+![퀴즈 최고 점수 확인](image/quiz_score.png)
