@@ -2,7 +2,8 @@ import json
 import os
 import random
 import sys
-import signal # 강제 종료(Ctrl+C) 방어용 모듈 추가
+import signal
+import shutil
 
 # 1. 순수 데이터 모델: 개별 퀴즈를 담당
 class Quiz:
@@ -33,7 +34,6 @@ class QuizGame:
             Quiz("쇼핑카트에 만두만 넣으면?", ["왕만두", "군만두", "만두튀김", "카트만두"], 4)
         ]
 
-    # FAIL #15 보완: 파일 열기/파싱 실패 예외 처리 및 복구 절차
     def load_data(self):
         if not os.path.exists("state.json"):
             self.set_default_quizzes()
@@ -49,13 +49,35 @@ class QuizGame:
                 for q in data.get("quizzes", []):
                     self.quiz_list.append(Quiz(q["question"], q["choices"], q["answer"]))
             print("\n📂 저장된 데이터를 성공적으로 불러왔어용!")
+            
         except (json.JSONDecodeError, IOError):
-            print("데이터 파일이 손상되었습니다. 기본 퀴즈로 초기화합니다.")
+            print("원본 데이터가 손상되었습니다. 백업 파일(state_backup.json)에서 복구를 시도합니다...")
+            # 백업 파일 존재 시 복구 시도
+            if os.path.exists("state_backup.json"):
+                try:
+                    with open("state_backup.json", "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        self.best_score = data.get("best_score", 0)
+                        self.quiz_list = []
+                        for q in data.get("quizzes", []):
+                            self.quiz_list.append(Quiz(q["question"], q["choices"], q["answer"]))
+                    # 복구 성공 시 다시 원본으로 덮어써서 완전 복구
+                    shutil.copy("state_backup.json", "state.json")
+                    print("\n📂 백업 데이터로 성공적으로 복구했어용!")
+                    return
+                except (json.JSONDecodeError, IOError):
+                    print("백업 데이터도 손상되었습니다.")
+                    
+            # 백업도 없거나 손상되었을 때 최후의 수단
+            print("기본 퀴즈로 초기화합니다.")
             self.best_score = 0
             self.set_default_quizzes()
 
-    # FAIL #17, PASS #3 보완: 데이터 손상 방지를 위한 임시 파일 기반 원자적 저장
     def save_data(self):
+        # 1. 기존 정상 데이터가 있다면 먼저 백업 파일로 복사(보존)해둠
+        if os.path.exists("state.json"):
+            shutil.copy("state.json", "state_backup.json")
+            
         temp_file = "state_temp.json"
         data = {
             "best_score": self.best_score,
@@ -69,8 +91,10 @@ class QuizGame:
             })
         
         try:
+            # 2. 임시 파일에 쓰기
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
+            # 3. 쓰기 완료 후 원본 파일 덮어쓰기 (원자적 저장)
             os.replace(temp_file, "state.json")
         except IOError as e:
             print(f"데이터 저장 중 오류 발생: {e}")
