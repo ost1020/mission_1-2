@@ -1,17 +1,66 @@
 import json
 import os
 import random
+import sys
+import signal # 강제 종료(Ctrl+C) 방어용 모듈 추가
 
-class Quiz:
+class QuizGame:
     def __init__(self, question, choices, answer):
         self.question = question
         self.choices = choices
         self.answer = answer
-
+        
     def display_quiz(self):
         print(f"\nQ. {self.question}")
         for i, choice in enumerate(self.choices, 1):
             print(f"{i}. {choice}")
+
+    def load_data(self):
+        # FAIL #15: 파일 열기/파싱 실패 예외 처리 및 복구 절차[span_4](start_span)[span_4](end_span)
+        if not os.path.exists("state.json"):
+            self.set_default_quizzes()
+            return
+        
+        try:
+            with open("state.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self.best_score = data.get("best_score", 0)
+                # (기존 퀴즈 로딩 로직 유지)
+        except (json.JSONDecodeError, IOError):
+            print("데이터 파일이 손상되었습니다. 기본 퀴즈로 초기화합니다.")
+            self.best_score = 0
+            self.set_default_quizzes()
+
+    def save_data(self):
+        # FAIL #17, PASS #3: 데이터 손상 방지를 위한 임시 파일 기반 원자적 저장(Atomic Save)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
+        temp_file = "state_temp.json"
+        data = {
+            "best_score": self.best_score,
+            "quizzes": [q.__dict__ for q in self.quizzes] # 퀴즈 객체를 딕셔너리로 변환
+        }
+        
+        try:
+            # 1. 임시 파일에 먼저 안전하게 쓰기
+            with open(temp_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+            # 2. 쓰기가 완벽히 끝나면 원본 파일과 교체 (도중 뻗어도 원본은 무사함)
+            os.replace(temp_file, "state.json")
+        except IOError as e:
+            print(f"데이터 저장 중 오류 발생: {e}")
+
+if __name__ == "__main__":
+    game = QuizGame()
+    
+    # FAIL #11: SIGINT(Ctrl+C)/SIGTERM 인터럽트 발생 시 안전 종료 처리[span_7](start_span)[span_7](end_span)
+    def signal_handler(sig, frame):
+        print("\n프로그램을 강제 종료합니다. 데이터를 안전하게 저장 중...")
+        game.save_data()
+        sys.exit(0)
+        
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    game.run()
             
 class QuizGame:
     def __init__(self):
