@@ -72,18 +72,20 @@ mission_1-2/
 
 ![개발환경](image/dev_env.png)
 
-### 깃허브
+### 깃허브 관련
 
 #### 커밋 이력
 
-![깃허브 로그](image/github_log.png)
+![커밋 이력](image/github_commit.png)
 
-#### 브랜치 병학
+#### 브랜치 그래프 및 병합
 
+![그래프 및 병합](image/github_merge.png)
 
+#### 클론 제작
 
-![깃허브 클론 제작](image/git_clone.png)
-
+![클론_1](image/git_clone_1.png)
+![클론_2](image/git_clone_2.png)
 
 ### 메인 메뉴
 ![메뉴](image/main_menu.png)
